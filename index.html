@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRRIGATION ASSISTANT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease-in-out;
+        }
+        /* Rain Animation */
+        .rain-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 1.5rem;
+        }
+        .drop {
+            position: absolute;
+            bottom: 100%;
+            width: 2px;
+            height: 60px; /* Longer drops */
+            background: linear-gradient(to bottom, rgba(135, 206, 235, 0), rgba(135, 206, 235, 0.9));
+            animation: rain-fall 0.6s linear infinite;
+        }
+        @keyframes rain-fall {
+            from { transform: translateY(0vh); }
+            to { transform: translateY(60vh); }
+        }
+        
+        /* Farmer Animation */
+        #farmer-svg {
+            width: 150px;
+            height: 150px;
+        }
+        #watering-can {
+            animation: water-tilt 3s ease-in-out infinite;
+            transform-origin: 80% 90%;
+        }
+        .droplet {
+            opacity: 0;
+            animation: water-drop 3s linear infinite;
+        }
+        @keyframes water-tilt {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(25deg); }
+            40% { transform: rotate(25deg); }
+            60% { transform: rotate(0deg); }
+        }
+        @keyframes water-drop {
+            0%, 20% { opacity: 0; transform: translateY(0); }
+            30% { opacity: 1; }
+            80% { opacity: 0; transform: translateY(60px); }
+            100% { opacity: 0; }
+        }
+        .droplet-1 { animation-delay: 0s; }
+        .droplet-2 { animation-delay: 0.3s; }
+        .droplet-3 { animation-delay: 0.6s; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-bold text-green-800 tracking-tight">IRRIGATION ASSISTANT</h1>
+            <p class="text-gray-600 mt-3 text-lg">Farmer best buddy</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Input Column -->
+            <div class="lg:col-span-2 card p-8">
+                <form id="irrigation-form">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-5 text-gray-700">1. Today's Conditions</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="precipitation" class="block text-sm font-medium text-gray-600 mb-1">Precipitation (mm)</label>
+                                <input type="number" id="precipitation" name="precipitation" step="0.1" required class="form-input w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., 0.5">
+                            </div>
+                            <div>
+                                <label for="temp_max" class="block text-sm font-medium text-gray-600 mb-1">Max Temperature (°C)</label>
+                                <input type="number" id="temp_max" name="temp_max" step="0.1" required class="form-input w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., 35.2">
+                            </div>
+                            <div>
+                                <label for="temp_min" class="block text-sm font-medium text-gray-600 mb-1">Min Temperature (°C)</label>
+                                <input type="number" id="temp_min" name="temp_min" step="0.1" required class="form-input w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., 22.1">
+                            </div>
+                            <div>
+                                <label for="wind" class="block text-sm font-medium text-gray-600 mb-1">Wind Speed (km/h)</label>
+                                <input type="number" id="wind" name="wind" step="0.1" required class="form-input w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., 5.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-5 text-gray-700">2. Farm Details</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="crop_type" class="block text-sm font-medium text-gray-600 mb-1">Crop Type</label>
+                                <select id="crop_type" name="crop_type" required class="form-select w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                    <option value="RICE">Rice</option><option value="BANANA">Banana</option><option value="SOYBEAN">Soybean</option><option value="CABBAGE">Cabbage</option><option value="POTATO">Potato</option><option value="MELON">Melon</option><option value="MAIZE">Maize</option><option value="CITRUS">Citrus</option><option value="BEAN">Bean</option><option value="WHEAT">Wheat</option><option value="MUSTARD">Mustard</option><option value="COTTON">Cotton</option><option value="SUGARCANE">Sugarcane</option><option value="TOMATO">Tomato</option><option value="ONION">Onion</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label for="soil_type" class="block text-sm font-medium text-gray-600 mb-1">Soil Type</label>
+                                <select id="soil_type" name="soil_type" required class="form-select w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                    <option value="DRY">Dry</option><option value="HUMID">Humid</option><option value="WET">Wet</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="region" class="block text-sm font-medium text-gray-600 mb-1">Region</label>
+                                <select id="region" name="region" required class="form-select w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                    <option value="DESSERT">Dessert</option><option value="SEMI ARID">Semi Arid</option><option value="SEMI HUMID">Semi Humid</option><option value="HUMID">Humid</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button type="submit" id="predict-btn" class="w-full bg-green-600 text-white font-bold py-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300 transform hover:scale-105">
+                            Get Recommendation
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Column -->
+            <div class="lg:col-span-3 card p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div id="animation-container" class="w-full h-48 mb-4 flex items-center justify-center"></div>
+                
+                <div id="loading" class="hidden">
+                    <svg class="animate-spin h-12 w-12 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="mt-3 text-gray-600">Analyzing data...</p>
+                </div>
+                
+                <div id="results-wrapper" class="w-full">
+                    <div id="weather-alert" class="hidden w-full mb-4 p-4 rounded-lg text-center font-bold text-lg"></div>
+                    <div id="results-content">
+                         <h2 class="text-xl font-semibold text-gray-500">Your irrigation recommendation will appear here.</h2>
+                        <p class="text-gray-400 mt-2">Fill out the form and click the button to start.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('irrigation-form');
+        const predictBtn = document.getElementById('predict-btn');
+        const loadingIndicator = document.getElementById('loading');
+        const resultsContent = document.getElementById('results-content');
+        const weatherAlert = document.getElementById('weather-alert');
+        const animationContainer = document.getElementById('animation-container');
+        const resultsWrapper = document.getElementById('results-wrapper');
+
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+        
+        const farmerSVG = `
+            <svg id="farmer-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                    <!-- Farmer Body -->
+                    <circle cx="100" cy="60" r="20" fill="#4a5568"/>
+                    <rect x="85" y="80" width="30" height="50" fill="#4a5568"/>
+                    <!-- Watering Can -->
+                    <g id="watering-can">
+                        <rect x="120" y="90" width="50" height="30" rx="5" fill="#718096"/>
+                        <rect x="165" y="100" width="20" height="10" fill="#718096"/>
+                        <path d="M115 90 Q 95 70 110 110" fill="none" stroke="#718096" stroke-width="8"/>
+                        <!-- Droplets -->
+                        <circle class="droplet droplet-1" cx="190" cy="110" r="3" fill="#3b82f6"/>
+                        <circle class="droplet droplet-2" cx="185" cy="112" r="3" fill="#3b82f6"/>
+                        <circle class="droplet droplet-3" cx="195" cy="108" r="3" fill="#3b82f6"/>
+                    </g>
+                </g>
+            </svg>
+        `;
+
+        const createRainAnimation = () => {
+            let dropsHTML = '<div class="rain-container">';
+            for (let i = 0; i < 60; i++) {
+                dropsHTML += `<div class="drop" style="left: ${Math.random()*100}%; animation-delay: ${Math.random()*0.6}s;"></div>`;
+            }
+            dropsHTML += '</div>';
+            animationContainer.innerHTML = dropsHTML;
+        };
+
+        const clearUI = () => {
+            animationContainer.innerHTML = '';
+            resultsWrapper.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+        };
+
+        const showResults = () => {
+             loadingIndicator.classList.add('hidden');
+             resultsWrapper.classList.remove('hidden');
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            clearUI();
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = '<span class="animate-pulse">Analyzing...</span>';
+
+            const sensorData = {
+                precipitation: parseFloat(document.getElementById('precipitation').value) || 0,
+                temp_max: parseFloat(document.getElementById('temp_max').value) || 0,
+                temp_min: parseFloat(document.getElementById('temp_min').value) || 0,
+                wind: parseFloat(document.getElementById('wind').value) || 0
+            };
+            const farmData = {
+                crop_type: document.getElementById('crop_type').value,
+                soil_type: document.getElementById('soil_type').value,
+                region: document.getElementById('region').value
+            };
+
+            try {
+                const weatherResponse = await fetch(`${API_BASE_URL}/predict_weather`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sensorData) });
+                if (!weatherResponse.ok) throw new Error('Weather prediction failed.');
+                const weatherResult = await weatherResponse.json();
+                const predictedWeather = weatherResult.weather;
+
+                const waterRequestData = { ...farmData, weather: 'SUNNY' };
+                const waterResponse = await fetch(`${API_BASE_URL}/predict_water`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(waterRequestData) });
+                if (!waterResponse.ok) throw new Error('Water requirement prediction failed.');
+                const waterResult = await waterResponse.json();
+                const waterRequirement = waterResult.water_requirement;
+
+                showResults();
+
+                if (predictedWeather === 'RAINY') {
+                    createRainAnimation();
+                    weatherAlert.textContent = 'IRRIGATION ON STANDBY, RAIN IS FORECASTED';
+                    weatherAlert.className = 'w-full mb-4 p-4 rounded-lg text-center font-bold text-lg bg-blue-100 text-blue-800 border border-blue-300';
+                    resultsContent.innerHTML = `
+                        <h2 class="text-3xl font-bold text-gray-700">No Irrigation Needed</h2>
+                        <p class="text-gray-500 mt-2">(If it were sunny, the water requirement would be ${waterRequirement} liters)</p>`;
+                } else if (predictedWeather === 'SUNNY') {
+                    animationContainer.innerHTML = farmerSVG;
+                    weatherAlert.textContent = 'IRRIGATION WATER IS DEPLOYED FOR A SUNNY DAY';
+                    weatherAlert.className = 'w-full mb-4 p-4 rounded-lg text-center font-bold text-lg bg-yellow-100 text-yellow-800 border border-yellow-300';
+                    resultsContent.innerHTML = `
+                        <h2 class="text-3xl font-bold text-green-700 mb-2">Recommendation: Irrigate</h2>
+                        <p class="text-gray-600 text-lg">Predicted Water Requirement:</p>
+                        <p class="text-6xl font-extrabold text-green-600 my-4">${waterRequirement} liters</p>
+                        <p class="text-md text-gray-500">Apply this amount for optimal crop growth.</p>`;
+                }
+                weatherAlert.classList.remove('hidden');
+
+            } catch (error) {
+                showResults();
+                resultsContent.innerHTML = `<p class="text-red-500 font-bold">An error occurred: ${error.message}</p>`;
+            } finally {
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = 'Get Recommendation';
+            }
+        });
+    </script>
+</body>
+</html>
